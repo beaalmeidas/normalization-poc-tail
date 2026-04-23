@@ -12,13 +12,16 @@ MODEL_ID = os.getenv("MODEL_ID")
 
 client = genai.Client(api_key=API_KEY)
 
-df = pd.read_csv("data/test.csv")
+df = pd.read_csv("data/attack.csv")
 
 results = run_pipeline(
-    data=df["descricao"].tolist(),
+    data=df["attacked"].tolist(),
     client=client,
     model_id=MODEL_ID
 )
 
-df["normalizado"] = [r["output"] for r in results]
-df.to_csv("data/results.csv", index=False)
+df["normalized"] = [r["normalized"] for r in results]
+
+df.to_csv("data/normalized.csv", index=False)
+
+print("\n--- Dataset normalized.csv gerado\n")

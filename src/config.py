@@ -1,27 +1,20 @@
 TEMPLATE = "{nome} {marca} {cor} {extras} - {quantidade} {unidade}"
 
 UNITS_MAP = {
-    "ML": "MILILITROS",
-    "L": "LITROS",
-    "LT": "LITROS",
-    "LTS": "LITROS",
+    "ML": ("MILILITRO", "MILILITROS"),
+    "L": ("LITRO", "LITROS"),
+    "LT": ("LITRO", "LITROS"),
+    "LTS": ("LITRO", "LITROS"),
+    "LITRO": ("LITRO", "LITROS"),
+    "LITROS": ("LITRO", "LITROS"),
 
-    "G": "GRAMAS",
-    "GR": "GRAMAS",
-    "GRAM": "GRAMAS",
-    "KG": "QUILOGRAMAS",
-    "KILO": "QUILOGRAMAS",
-    "QUILO": "QUILOGRAMAS",
+    "G": ("GRAMA", "GRAMAS"),
+    "GR": ("GRAMA", "GRAMAS"),
+    "GRAMAS": ("GRAMA", "GRAMAS"),
 
-    "UN": "UNIDADE",
-    "UND": "UNIDADE",
-    "UNID": "UNIDADE",
-
-    "CX": "CAIXA",
-    "PCT": "PACOTE",
-    "PC": "PACOTE",
-
-    "DZ": "DUZIA",
+    "KG": ("QUILOGRAMA", "QUILOGRAMAS"),
+    "QUILOGRAMA": ("QUILOGRAMA", "QUILOGRAMAS"),
+    "QUILOGRAMAS": ("QUILOGRAMA", "QUILOGRAMAS"),
 }
 
 DEFAULT_COLOR = "S/C"

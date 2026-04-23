@@ -1,35 +1,37 @@
 import re
-from .config import TEMPLATE, UNIDADES_MAP, DEFAULT_COLOR
+from .config import TEMPLATE, UNITS_MAP, DEFAULT_COLOR
 
 
 def normalize_unit(unit: str):
     if not unit:
         return None
-    return UNIDADES_MAP.get(unit.upper(), unit)
+    return UNITS_MAP.get(unit.upper(), unit)
 
-def ensure_color(cor: str):
-    return cor if cor else DEFAULT_COR
+def ensure_color(text: str):
+    if " S/C " in text:
+        return text
 
-def validate_format(text: str):
-    pattern = r".+ - \d+(\.\d+)? (MILILITROS|LITROS|GRAMAS|QUILOGRAMAS)"
-    return bool(re.match(pattern, text))
+    if " - " in text:
+        left, right = text.split(" - ")
+        if len(left.split()) < 3:
+            left += " S/C"
+        return f"{left} - {right}"
 
-def build_output(nome, marca, cor, extras, quantidade, unidade):
-    cor = ensure_color(cor)
-    unidade = normalize_unit(unidade)
+    return text
 
-    extras_str = f" {extras}" if extras else ""
+def fix_unit(text: str):
+    pattern = r"(\d+(?:\.\d+)?)\s*(ML|L|KG|G|UN|UND|CX|PCT|DZ)"
+    
+    def repl(match):
+        qtd = match.group(1)
+        unit = normalize_unit(match.group(2))
+        return f"{qtd} {unit}"
 
-    return f"{nome} {marca} {cor}{extras_str} - {quantidade} {unidade}"
+    return re.sub(pattern, repl, text)
 
-def postprocess(llm_output: dict):
-    nome = llm_output.get("nome")
-    marca = llm_output.get("marca")
-    cor = llm_output.get("cor")
-    extras = llm_output.get("extras")
-    quantidade = llm_output.get("quantidade")
-    unidade = llm_output.get("unidade")
+def postprocess(text: str):
+    text = text.upper()
+    text = fix_unit(text)
+    text = ensure_color(text)
 
-    final = build_output(nome, marca, cor, extras, quantidade, unidade)
-
-    return final
+    return text
