@@ -14,10 +14,13 @@ client = genai.Client(api_key=API_KEY)
 
 df = pd.read_csv("data/attack.csv")
 
+df_few_shot = pd.read_csv("data/few_shot.csv")
+
 results = run_pipeline(
     data=df["attacked"].tolist(),
     client=client,
-    model_id=MODEL_ID
+    model_id=MODEL_ID,
+    df_few_shot=df_few_shot
 )
 
 df["normalized"] = [r["normalized"] for r in results]

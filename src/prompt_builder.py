@@ -32,24 +32,38 @@ def montar_prompt_batch(itens_batch, df_few_shot):
     itens_str = "\n".join([f'{i+1}. "{item}"' for i, item in enumerate(itens_batch)])
 
     prompt = f"""
-Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras.
-Seu objetivo é padronizar descrições sujas/abreviadas para um formato legível e consistente.
+        Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras.
+        Seu objetivo é padronizar descrições sujas/abreviadas para um formato legível e consistente.
 
-Formato obrigatório:
-NOME MARCA COR {...} - QUANTIDADE UNIDADE
+        Formato:
+        NOME MARCA [COR] [EXTRAS] - QUANTIDADE UNIDADE
 
-Regras:
-- MAIÚSCULO
-- Se não houver cor = usar S/C
-- NÃO inventar informação
-- NÃO mudar a ordem
+        Regras:
+        - Tudo em MAIÚSCULO
+        - NÃO inventar informações
+        - NÃO mudar a ordem das informações
 
-Exemplos:
-{few_shot_str}
+        Sobre COR:
+        - Só incluir COR se o produto realmente tiver cor (ex: roupas, tintas, etc)
+        - NÃO usar "S/C"
+        - Se não houver cor → simplesmente NÃO colocar nada
 
-Itens:
-{itens_str}
+        Sobre EXTRAS:
+        - Informações como sabor, fragrância, essência, tipo, modelo, variante
+        - Exemplos: TRADICIONAL, BAUNILHA, NEUTRO, LIGHT, ZERO
+        - Devem aparecer antes do "-"
+        - Não repetir informação
 
-Responda com uma linha por item, na mesma ordem.
-"""
+        Unidades:
+        - Sempre em extenso (ex: L → LITROS, KG → QUILOGRAMAS)
+
+        Exemplos:
+        {few_shot_str}
+
+        Itens:
+        {itens_str}
+
+        Responda com uma linha por item, na mesma ordem.
+        Sem explicações.
+    """
     return prompt

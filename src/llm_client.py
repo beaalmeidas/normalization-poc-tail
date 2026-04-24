@@ -16,4 +16,5 @@ def call_llm(client, model_id, prompt, max_retries=3):
             print(f"Erro: {e}")
             time.sleep(1)
 
+    print("\n--- Falhou após retries\n")
     return None

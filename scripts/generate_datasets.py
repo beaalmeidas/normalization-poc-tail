@@ -18,8 +18,6 @@ UNITS_MAP = {
     "QUILOGRAMAS": ("QUILOGRAMA", "QUILOGRAMAS"),
 }
 
-DEFAULT_COLOR = "S/C"
-
 
 def normalize_text(text: str):
     text = text.upper()
