@@ -1,6 +1,5 @@
 import re
 
-from .config import UNITS_MAP
 from .utils import clean_text, normalize_number
 
 
