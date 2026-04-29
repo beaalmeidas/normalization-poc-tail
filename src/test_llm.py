@@ -4,11 +4,6 @@ from google import genai
 import os
 from dotenv import load_dotenv
 
-env_path = Path(__file__).resolve().parent.parent / ".env"
-load_dotenv(env_path)
-model_id = os.getenv("MODEL_ID")
-print("MODEL_ID:", model_id)
-print("API_KEY:", os.getenv("GOOGLE_API_KEY"))
 
 def main():
     env_path = Path(__file__).resolve().parent.parent / ".env"
