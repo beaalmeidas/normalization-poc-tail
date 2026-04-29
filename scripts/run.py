@@ -17,14 +17,13 @@ df = pd.read_csv("data/attack.csv")
 df_few_shot = pd.read_csv("data/few_shot.csv")
 
 results = run_pipeline(
-    data=df["attacked"].tolist(),
+    data=df.to_dict(orient="records"),
     client=client,
     model_id=MODEL_ID,
     df_few_shot=df_few_shot
 )
 
-df["normalized"] = [r["normalized"] for r in results]
-
-df.to_csv("data/normalized.csv", index=False)
+df_out = pd.DataFrame(results)
+df_out.to_csv("data/normalized.csv", index=False)
 
 print("\n--- Dataset normalized.csv gerado\n")

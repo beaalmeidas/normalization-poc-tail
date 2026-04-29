@@ -5,8 +5,8 @@ def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
     exemplos = []
 
     for _, row in df_few_shot.head(max_examples).iterrows():
-        entrada = row['item_nao_normalizado']
-        saida   = row['item_normalizado']
+        entrada = row['attacked']
+        saida   = row['normalized']
 
         exemplos.append(
             f'Entrada: "{entrada}"\nSaída: "{saida}"'

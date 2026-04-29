@@ -8,7 +8,7 @@ from .utils import clean_text, normalize_number
     # retorna um dicionário com cada ponto definido
     # caso algum não seja aplicável, retorna none
 def extract_measurement_and_packaging(text: str):
-    number = r"(\d+(?:\d+)?)"
+    number = r"(\d+(?:[.,]\d+)?)"
     units = r"(ML|L|LT|LTS|G|GR|KG|QUILO|KILO|MM|CM|M|UN|UND|CX|PCT|FD|DZ)"
 
     peso_volume = re.search(rf"{number}\s*{units}", text)

@@ -1,5 +1,6 @@
 import re
-from .config import TEMPLATE, UNITS_MAP
+from .config import UNITS_MAP
+from .utils import clean_text
 
 
 def normalize_unit(unit: str):
@@ -32,6 +33,15 @@ def format_unit(qtd, unit):
         return f"{qtd:g} {plural}"
 
 def postprocess(llm_output: str, quantidade, unidade):
-    text = llm_output.upper().strip()
+    text = llm_output.clean_text()
 
-    return f"{text} - {quantidade} {unidade}"
+    singular, plural = UNITS_MAP.get(unidade.upper(), (unidade, unidade))
+
+    quantidade = float(quantidade)
+
+    if quantidade == 1:
+        unidade_final = singular
+    else:
+        unidade_final = plural
+
+    return f"{text} - {quantidade:g} {unidade_final}"
