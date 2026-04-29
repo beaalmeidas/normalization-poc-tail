@@ -4,13 +4,19 @@ from .llm_client import call_llm
 from .post_process import postprocess
 
 
-def run_pipeline(data, client, model_id, df_few_shot, batch_size=1):
+def run_pipeline(
+        data, 
+        client, 
+        model_id, 
+        df_few_shot, 
+        batch_size=1
+    ):
     results = []
 
     for i in range(0, len(data), batch_size):
         batch = data[i:i+batch_size]
 
-        batch_pre = [preprocess(x)["raw"] for x in batch]
+        batch_pre = [preprocess(x) for x in batch]
 
         prompt = montar_prompt_batch(batch_pre, df_few_shot)
 
