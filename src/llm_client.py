@@ -1,7 +1,9 @@
 import time
 
+from .config import MAX_RETRIES
 
-def call_llm(client, model_id, prompt, max_retries=3):
+
+def call_llm(client, model_id, prompt, max_retries=MAX_RETRIES):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(

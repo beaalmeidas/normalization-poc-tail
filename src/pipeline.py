@@ -1,5 +1,6 @@
+from .config import BATCH_SIZE
 from .pre_process import preprocess
-from .prompt_builder import build_prompt, montar_prompt_batch
+from .prompt_builder import build_prompt, build_fewshot_prompt
 from .llm_client import call_llm
 from .post_process import postprocess
 
@@ -9,7 +10,7 @@ def run_pipeline(
         client, 
         model_id, 
         df_few_shot, 
-        batch_size=1
+        batch_size=BATCH_SIZE
     ):
     results = []
 
@@ -18,7 +19,10 @@ def run_pipeline(
 
         batch_pre = [preprocess(x) for x in batch]
 
-        prompt = montar_prompt_batch(batch_pre, df_few_shot)
+        prompt = build_fewshot_prompt(
+            [item["raw"] for item in batch_pre],
+            df_few_shot
+        )
 
         response = call_llm(client, model_id, prompt)
 

@@ -31,18 +31,7 @@ def format_unit(qtd, unit):
     else:
         return f"{qtd:g} {plural}"
 
-def postprocess(text: str):
-    # text = text.upper()
-    # text = fix_unit(text)
+def postprocess(llm_output: str, quantidade, unidade):
+    text = llm_output.upper().strip()
 
-    # return text
-    text = text.upper()
-
-    unidade_final = apply_unit_rules(text)
-
-    # Remove unidades antigas do texto (opcional, melhora qualidade)
-    text = re.sub(r"\d+(?:\.\d+)?\s*(ML|L|LT|G|KG|CX|PCT|FD|DZ|UN|UND)", "", text)
-
-    text = re.sub(r"\s+", " ", text).strip()
-
-    return f"{text} - {unidade_final}"
+    return f"{text} - {quantidade} {unidade}"

@@ -47,7 +47,7 @@ def parse_measurements_and_packaging(medidas: dict):
     return 1, "UN"
 
 
-# converte informações de medida e embalagem para os padrões semânticos estabelecidos 
+# converte informações recebidas da função anterior para os padrões semânticos estabelecidos 
 def normalize_unit(unit: str, quantity: float):
     singular, plural = UNITS_MAP.get(unit, (unit, unit))
     return singular if quantity == 1 else plural

@@ -1,22 +1,10 @@
-def load_prompt_template(path: str) -> str:
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read()
+from .config import MAX_FEWSHOT_EXAMPLES
 
-def build_prompt(template: str, examples: list, input_text: str) -> str:
-    examples_str = ""
 
-    for ex in examples:
-        examples_str += f"Entrada: {ex['input']}\nSaída: {ex['output']}\n\n"
-
-    return template.format(
-        examples=examples_str,
-        input=input_text
-    )
-
-def montar_few_shot_str(df_few_shot):
+def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
     exemplos = []
 
-    for _, row in df_few_shot.iterrows():
+    for _, row in df_few_shot.head(max_examples).iterrows():
         entrada = row['item_nao_normalizado']
         saida   = row['item_normalizado']
 
@@ -26,36 +14,33 @@ def montar_few_shot_str(df_few_shot):
 
     return "\n\n".join(exemplos)
 
-def montar_prompt_batch(itens_batch, df_few_shot):
-    few_shot_str = montar_few_shot_str(df_few_shot)
 
-    itens_str = "\n".join([f'{i+1}. "{item}"' for i, item in enumerate(itens_batch)])
+def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
+    few_shot_str = build_fewshot_examples(df_few_shot, max_examples)
+
+    itens_str = "\n".join([f'{i+1}. "{item}"' for i, item in enumerate(items_batch)])
 
     prompt = f"""
         Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras.
         Seu objetivo é padronizar descrições sujas/abreviadas para um formato legível e consistente.
 
         Formato:
-        NOME MARCA [COR] [EXTRAS] - QUANTIDADE UNIDADE
+        NOME MARCA [EXTRAS]
 
-        Regras:
+        Regras gerais:
         - Tudo em MAIÚSCULO
         - NÃO inventar informações
         - NÃO mudar a ordem das informações
-
-        Sobre COR:
-        - Só incluir COR se o produto realmente tiver cor (ex: roupas, tintas, etc)
-        - NÃO usar "S/C"
-        - Se não houver cor → simplesmente NÃO colocar nada
+        - NÃO incluir quantidade nem unidade (ex: 500ML, 2L, CX, UN, etc)
+        - NÃO incluir códigos ou abreviações de embalagem (CX, PCT, FD, DZ, etc)
 
         Sobre EXTRAS:
-        - Informações como sabor, fragrância, essência, tipo, modelo, variante
-        - Exemplos: TRADICIONAL, BAUNILHA, NEUTRO, LIGHT, ZERO
-        - Devem aparecer antes do "-"
+        - Informações como cor, sabor, fragrância, essência, tipo, modelo, variante
+        - Só incluir cor se o produto realmente tiver cor (ex: roupas, tintas, etc)
+        - NÃO usar "S/C" para produtos sem cor
+        - Se não houver cor -> NÃO colocar nada
+        - Exemplos: PRETO, TRADICIONAL, BAUNILHA, NEUTRO, LIGHT, ZERO
         - Não repetir informação
-
-        Unidades:
-        - Sempre em extenso (ex: L → LITROS, KG → QUILOGRAMAS)
 
         Exemplos:
         {few_shot_str}
