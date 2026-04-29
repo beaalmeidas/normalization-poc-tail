@@ -4,7 +4,7 @@ from .llm_client import call_llm
 from .post_process import postprocess
 
 
-def run_pipeline(data, client, model_id, df_few_shot, batch_size=10):
+def run_pipeline(data, client, model_id, df_few_shot, batch_size=1):
     results = []
 
     for i in range(0, len(data), batch_size):

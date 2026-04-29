@@ -9,12 +9,13 @@ def call_llm(client, model_id, prompt, max_retries=3):
                 contents=prompt,
                 config={"temperature": 0.0}
             )
+            time.sleep(3)
 
             return response.text.strip()
 
         except Exception as e:
             print(f"Erro: {e}")
-            time.sleep(1)
+            time.sleep(3)
 
     print("\n--- Falhou após retries\n")
     return None

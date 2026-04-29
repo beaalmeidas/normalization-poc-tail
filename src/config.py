@@ -1,4 +1,4 @@
-TEMPLATE = "{nome} {marca} {cor} {extras} - {quantidade} {unidade}"
+TEMPLATE = "{nome} {marca} {extras} - {quantidade} {unidade}"
 
 UNITS_MAP = {
     "ML": ("MILILITRO", "MILILITROS"),

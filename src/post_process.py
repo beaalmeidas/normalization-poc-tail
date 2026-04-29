@@ -1,5 +1,5 @@
 import re
-from .config import TEMPLATE, UNITS_MAP, DEFAULT_COLOR
+from .config import TEMPLATE, UNITS_MAP
 
 
 def normalize_unit(unit: str):
