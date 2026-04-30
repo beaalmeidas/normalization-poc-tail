@@ -5,7 +5,7 @@ def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
     exemplos = []
 
     for _, row in df_few_shot.head(max_examples).iterrows():
-        entrada = row['attacked']
+        entrada = row.get('attacked', row.get('title'))
         saida   = row['normalized']
 
         exemplos.append(
