@@ -8,10 +8,10 @@ from .utils import clean_text, normalize_number
     # caso algum não seja aplicável, retorna none
 def extract_measurement_and_packaging(text: str):
     number = r"(\d+(?:[.,]\d+)?)"
-    units = r"(ML|L|LT|LTS|G|GR|KG|QUILO|KILO|MM|CM|M|UN|UND|CX|PCT|FD|DZ)"
+    units = r"(ML|L|LT|LTS|G|GR|KG|QUILO|KILO|MM|CM|M|UN|UND|CX|PCT|FD|DZ|KB|MB|GB|TB)"
 
     peso_volume = re.search(rf"{number}\s*{units}", text)
-    dimensao = re.search(rf"{number}\s*(MM|CM|M)", text)
+    dimensao = re.search(rf"{number}\s*(MM|CM|M|GB|TB|MB|KB)", text)
     tipo_embalagem = re.search(r"(CX|PCT|FD|DZ)\s*(?:C\/\s*)?(\d+)", text)
     unidade_simples = re.search(r"(\d+)\s*(UN|UND)", text)
     multipack = re.search(rf"(\d+)\s*[xX]\s*{number}\s*{units}", text)

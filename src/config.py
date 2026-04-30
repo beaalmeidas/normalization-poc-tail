@@ -25,6 +25,12 @@ UNITS_MAP = {
     "PCT": ("PACOTE", "PACOTES"),
     "FD": ("FARDO", "FARDOS"),
     "DZ": ("DÚZIA", "DÚZIAS"),
+
+    # Armazenamento digital
+    "KB": ("KILOBYTE", "KILOBYTES"),
+    "MB": ("MEGABYTE", "MEGABYTES"),
+    "GB": ("GIGABYTE", "GIGABYTES"),
+    "TB": ("TERABYTE", "TERABYTES"),
 }
 
 BATCH_SIZE = 5
