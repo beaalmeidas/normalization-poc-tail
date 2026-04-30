@@ -87,17 +87,19 @@ def shuffle_words(text):
 
 
 def augment(text):
-    return list(set([
+    variations = [
         text,
         keyboard_typos(text),
         random_separators(text),
         random_case(text),
         drop_words(text),
         shuffle_words(text),
-    ]))
+    ]
+
+    return list(set([v for v in variations if v.strip()]))
 
 
-df = pd.read_csv("data/test.csv")
+df = pd.read_csv("./data/input/test.csv")
 
 rows = []
 
@@ -111,6 +113,6 @@ for title in df["title"]:
         })
 
 attack_df = pd.DataFrame(rows)
-attack_df.to_csv("data/attack4.csv", index=False)
+attack_df.to_csv("./data/input/attack.csv", index=False)
 
-print("\n--- Dataset attack.csv gerado\n")
+print("\n--- Dataset com attack augmentation 'attack.csv' gerado\n")

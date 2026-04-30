@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import re
+from sklearn.model_selection import train_test_split
 
 
 # extraindo dados dos datasets octaprice
@@ -40,7 +41,7 @@ df2 = df2[["title"]]
 df_final = pd.concat([df1, df2], ignore_index=True)
 
 
-# padronizando e limpando
+# padronizando e limpando dataset não-supervisionado
 df_final["title"] = df_final["title"].str.upper().str.strip()
 
 df_final = (
@@ -51,3 +52,16 @@ df_final = (
 )
 
 df_final.to_csv("./data/input/test.csv", index=False, encoding="utf-8")
+print("\n--- Dataset inicial 'test.csv' gerado\n")
+
+
+# dividindo dataset supervisionado em conjuntos de treino e teste
+df_initial = pd.read_csv("./data/initial/itens_nf_normalizados.csv")
+
+train, test = train_test_split(df_initial, test_size=0.2, random_state=42)
+
+train.to_csv("./data/input/train_supervised.csv", index=False, encoding="utf-8")
+print("\n--- Dataset de treino 'train_supervised.csv' gerado\n")
+
+test.to_csv("./data/input/test_supervised.csv", index=False, encoding="utf-8")
+print("\n--- Dataset de teste 'test_supervised.csv' gerado\n")
