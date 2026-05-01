@@ -1,3 +1,4 @@
+import time
 from .config import BATCH_SIZE
 from .pre_process import preprocess
 from .prompt_builder import build_fewshot_prompt
@@ -34,7 +35,16 @@ def run_pipeline(
             df_few_shot
         )
 
+        # print("----- DEBUG -----")
+        # print("Batch size:", len(preprocessed_batch))
+        # print("Itens no batch:", [item["raw"] for item in preprocessed_batch])
+        # print("Prompt length (chars):", len(prompt))
+        # print("Prompt preview:\n", prompt[:300])
+        # print("-----------------")
+
         response = call_llm(client, model_id, prompt)
+
+        time.sleep(6)
 
         if not response:
             print("\n--- LLM falhou para esse batch\n")
@@ -52,8 +62,7 @@ def run_pipeline(
         for processed_item, linha in zip(preprocessed_batch, linhas):
             final = postprocess(
                 linha,
-                processed_item["quantidade"],
-                processed_item["unidade"]
+                processed_item["medidas"]
             )
 
             results.append({

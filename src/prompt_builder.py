@@ -18,7 +18,7 @@ def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
 def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
     few_shot_str = build_fewshot_examples(df_few_shot, max_examples)
 
-    itens_str = "\n".join([f'{i+1}. "{item}"' for i, item in enumerate(items_batch)])
+    itens_str = "\n".join([f'"{item}"' for i, item in enumerate(items_batch)])
 
     prompt = f"""
         Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras.

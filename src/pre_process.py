@@ -27,23 +27,25 @@ def extract_measurement_and_packaging(text: str):
 
 # define quantidades e embalagem em pares número-unidade
 def parse_measurements_and_packaging(medidas: dict):
-    if medidas["tipo_embalagem"]:
-        tipo, qtd = medidas["tipo_embalagem"]
-        return int(qtd), tipo
-
-    if medidas["unidade_simples"]:
-        qtd, unidade = medidas["unidade_simples"]
-        return int(qtd), unidade
-
-    if medidas["multipack"]:
-        qtd_pack, valor, unidade = medidas["multipack"]
-        return int(qtd_pack), "UN"
+    result = []
 
     if medidas["peso_volume"]:
         valor, unidade = medidas["peso_volume"]
-        return float(valor), unidade
+        result.append((float(valor), unidade))
 
-    return 1, "UN"
+    if medidas["tipo_embalagem"]:
+        tipo, qtd = medidas["tipo_embalagem"]
+        result.append((int(qtd), tipo))
+
+    if medidas["unidade_simples"]:
+        qtd, unidade = medidas["unidade_simples"]
+        result.append((int(qtd), unidade))
+
+    if medidas["multipack"]:
+        qtd_pack, valor, unidade = medidas["multipack"]
+        result.append((int(qtd_pack), "UN"))
+
+    return result if result else [(1, "UN")]
 
 
 def preprocess(text: str) -> dict:
@@ -52,11 +54,9 @@ def preprocess(text: str) -> dict:
 
     medidas = extract_measurement_and_packaging(text)
 
-    quantidade, unidade = parse_measurements_and_packaging(medidas)
+    medidas_formatadas = parse_measurements_and_packaging(medidas)
 
     return {
         "raw": text,
-        "quantidade": quantidade,
-        "unidade": unidade,
-        "medidas": medidas
+        "medidas": medidas_formatadas
     }

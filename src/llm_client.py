@@ -1,4 +1,5 @@
 import time
+import random
 
 from .config import MAX_RETRIES
 
@@ -11,13 +12,16 @@ def call_llm(client, model_id, prompt, max_retries=MAX_RETRIES):
                 contents=prompt,
                 config={"temperature": 0.0}
             )
-            time.sleep(3)
 
             return response.text.strip()
 
         except Exception as e:
+            wait_time = (2 ** attempt) + random.uniform(0, 1)
+
             print(f"Erro: {e}")
-            time.sleep(3)
+            print(f"Tentativa {attempt+1}/{max_retries} → aguardando {wait_time:.2f}s\n")
+
+            time.sleep(wait_time)
 
     print("\n--- Falhou após retries\n")
     return None

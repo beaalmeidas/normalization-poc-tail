@@ -1,3 +1,5 @@
+import re
+
 from .utils import clean_text, normalize_unit
 
 
@@ -17,9 +19,18 @@ def format_unit(qtd, unit):
         return f"{qtd:g} {plural}"
 
 
-def postprocess(llm_output: str, quantidade, unidade):
+def postprocess(llm_output: str, medidas):
     text = clean_text(llm_output)
 
-    unidade_final = format_unit(quantidade, unidade)
+    text = re.sub(r"^\d+\.\s*", "", text)
+
+    unidades_formatadas = [
+        format_unit(qtd, unidade)
+        for qtd, unidade in medidas
+    ]
+
+    unidades_formatadas = [u for u in unidades_formatadas if u]
+
+    unidade_final = ", ".join(unidades_formatadas)
 
     return f"{text} - {unidade_final}"

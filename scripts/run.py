@@ -14,6 +14,7 @@ client = genai.Client(api_key=API_KEY)
 
 
 df = pd.read_csv("data/input/attack.csv")
+df = df.sample(20, random_state=42)
 
 df_few_shot = pd.read_csv("data/input/train_supervised.csv")
 
@@ -25,5 +26,5 @@ results = run_pipeline(
 )
 
 df_out = pd.DataFrame(results)
-df_out.to_csv("data/normalized.csv", index=False)
+df_out.to_csv("data/output/normalized.csv", index=False)
 print("\n--- Dataset final 'normalized.csv' gerado\n")
