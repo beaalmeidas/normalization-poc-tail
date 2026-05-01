@@ -1,6 +1,12 @@
 import re
+import os
 
 from .config import UNITS_MAP
+
+
+def ensure_dir(path: str):
+    os.makedirs(path, exist_ok=True)
+
 
 # padroniza o texto para maiúsculo, remove espaços duplos ou no início e fim
 def clean_text(text: str) -> str:

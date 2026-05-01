@@ -1,5 +1,8 @@
 import pandas as pd
 import random
+import re
+
+from src.utils import ensure_dir
 
 
 # mapa para typos, teclas próximas no teclado
@@ -86,6 +89,28 @@ def shuffle_words(text):
     return " ".join(words)
 
 
+# evitando que conjuntos semânticos "COM/SEM + substantivo" sejam separados
+    # já que não seria uma alteração realista e atrapalharia o processamento
+COMPOSITION_PATTERN = r"\b(SEM|COM)\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ]+)"
+
+def protect_compositions(text: str):
+    protected = []
+
+    def repl(match):
+        token = f"__COMP_{len(protected)}__"
+        protected.append(match.group(0))
+        return token
+
+    text = re.sub(COMPOSITION_PATTERN, repl, text)
+    return text, protected
+
+
+def restore_compositions(text: str, protected):
+    for i, original in enumerate(protected):
+        text = text.replace(f"__COMP_{i}__", original)
+    return text
+
+
 def augment(text):
     variations = [
         text,
@@ -97,6 +122,9 @@ def augment(text):
     ]
 
     return list(set([v for v in variations if v.strip()]))
+
+
+ensure_dir("./data/input")
 
 
 df = pd.read_csv("./data/input/test.csv")

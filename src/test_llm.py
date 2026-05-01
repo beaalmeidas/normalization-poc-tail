@@ -11,15 +11,17 @@ def main():
     model_id = os.getenv("MODEL_ID")
 
     if not model_id:
-        print("MODEL_ID não encontrado na .env")
+        print("\n--- Id da LLM não encontrado na .env\n")
         return
 
     client = genai.Client()
 
+    print("\n")
     response = client.models.generate_content(
         model=model_id,
-        contents="Responda apenas: OK"
+        contents="Responda apenas: Sou a LLM e estou funcionando!"
     )
+    print("\n")
 
     try:
         print(response.text)
@@ -27,7 +29,7 @@ def main():
         try:
             print(response.candidates[0].content.parts[0].text)
         except Exception as e:
-            print("Erro ao ler resposta:", e)
+            print("\n--- Erro ao ler resposta:", e)
             print(response)
 
 

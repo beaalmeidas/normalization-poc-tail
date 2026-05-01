@@ -1,7 +1,10 @@
 import json
 import pandas as pd
 import re
+
 from sklearn.model_selection import train_test_split
+
+from src.utils import ensure_dir
 
 
 # extraindo dados dos datasets octaprice
@@ -50,6 +53,8 @@ df_final = (
     .drop_duplicates()
     .reset_index(drop=True)
 )
+
+ensure_dir("./data/input")
 
 df_final.to_csv("./data/input/test.csv", index=False, encoding="utf-8")
 print("\n--- Dataset inicial 'test.csv' gerado\n")
