@@ -1,27 +1,36 @@
 import time
 import random
+from ollama import chat
 
 from .config import MAX_RETRIES
 
 
-def call_llm(client, model_id, prompt, max_retries=MAX_RETRIES):
-    for attempt in range(max_retries):
+def call_llm(prompt, max_retries=MAX_RETRIES):
+    for attempt in range(MAX_RETRIES):
         try:
-            response = client.models.generate_content(
-                model=model_id,
-                contents=prompt,
-                config={"temperature": 0.0}
+            response = chat(
+                model='gemma2:latest',
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras."
+                    },
+                    {
+                        'role': 'user', 
+                        'content': prompt
+                    }
+                ],
+                options={
+                    "temperature": 0.0
+                }
             )
 
-            return response.text.strip()
+            return response.message.content.strip()
 
         except Exception as e:
             wait_time = (2 ** attempt) + random.uniform(0, 1)
 
-            print(f"Erro: {e}")
-            print(f"Tentativa {attempt+1}/{max_retries} → aguardando {wait_time:.2f}s\n")
+            print(f"\n--- Erro: {e}")
+            print(f"\n--- Tentativa {attempt+1}/{max_retries} - aguardando {wait_time:.2f}s\n")
 
             time.sleep(wait_time)
-
-    print("\n--- Falhou após retries\n")
-    return None

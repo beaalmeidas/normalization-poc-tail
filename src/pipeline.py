@@ -1,4 +1,6 @@
 import time
+import os
+
 from .config import BATCH_SIZE
 from .pre_process import preprocess
 from .prompt_builder import build_fewshot_prompt
@@ -42,7 +44,12 @@ def run_pipeline(
         # print("Prompt preview:\n", prompt[:300])
         # print("-----------------")
 
-        response = call_llm(client, model_id, prompt)
+        response = call_llm(prompt)
+
+        # salvando o output cru da llm para análise caso o csv não funcione
+        output_dir = "data/output"
+        with open(os.path.join(output_dir, "llm_raw_output.txt"), "w", encoding="utf-8") as f:
+            f.write(response)
 
         time.sleep(6)
 

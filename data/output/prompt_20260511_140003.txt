@@ -1,29 +1,6 @@
-import datetime
-import os
-
-from .config import MAX_FEWSHOT_EXAMPLES
+TOTAL_ITENS: 5
 
 
-def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
-    exemplos = []
-
-    for _, row in df_few_shot.head(max_examples).iterrows():
-        entrada = row.get('attacked', row.get('title'))
-        saida   = row['normalized']
-
-        exemplos.append(
-            f'Entrada: "{entrada}"\nSaída: "{saida}"'
-        )
-
-    return "\n\n".join(exemplos)
-
-
-def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
-    few_shot_str = build_fewshot_examples(df_few_shot, max_examples)
-
-    itens_str = "\n".join([f'"{item}"' for i, item in enumerate(items_batch)])
-
-    prompt = f"""
         Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras.
         Seu objetivo é padronizar descrições sujas/abreviadas para um formato legível e consistente.
 
@@ -47,29 +24,27 @@ def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAM
         - Não repetir informação
 
         Exemplos:
-        {few_shot_str}
+        Entrada: "ACUCAR CRISTAL UNIAO 1KG"
+Saída: "AÇÚCAR UNIÃO CRISTAL - 1 QUILOGRAMA"
+
+Entrada: "FEIJ CARIOCA KIC 1KG"
+Saída: "FEIJÃO KICALDO CARIOCA - 1 QUILOGRAMA"
+
+Entrada: "MAC ESAGUETE ADRIA 500G"
+Saída: "MACARRÃO ESPAGUETE ADRIA - 500 GRAMAS"
 
         Itens:
-        {itens_str}
+        "NEUTRAQUIMIC 500ML ELIMINA CHEIRO PREVINE E QUEDA BORABELLA"
+"2X1000ML PROLISS CAPILAR PHIOS ORIGINAL MY REALINHAMENTO"
+"FELPS KIT BANHO DE VERNIZ 2X1L MASCARA 1KG BRINDE"
+"MSSCARA CAPILAR NITRICO INRENSA BANAJA E MEL PFOHAIR 1KG"
+"ZAP KIT ALL BRINDE PROGRESSIVA TIME FORMOL 2 ORGNICA SEM"
 
         REGRAS DE SAÍDA (OBRIGATÓRIO):
-        - Retorne exatamente {len(items_batch)} linhas
+        - Retorne exatamente 5 linhas
         - Uma linha por item
         - NÃO numere
         - NÃO explique
         - NÃO adicione texto extra
         - NÃO pule linhas
-    """
-
-    # salvando o prompt construído
-    output_dir = "data/output"
-    os.makedirs(output_dir, exist_ok=True)
-
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_path = os.path.join(output_dir, f"prompt_{timestamp}.txt")
-
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(f"TOTAL_ITENS: {len(items_batch)}\n\n")
-        f.write(prompt)
-
-    return prompt
+    
