@@ -1,0 +1,56 @@
+{
+  "metrics": {
+    "mean_constancy": 0.5683333333333334,
+    "min_constancy": 0.16666666666666666,
+    "max_constancy": 1.0,
+    "num_originals": 100,
+    "total_rows": 600,
+    "weighted_constancy": 0.5683333333333334
+  },
+  "best_grouping": {
+    "original": "KIT 2 HIDRALISO ALISANTE NATURAL PARA TODOS OS CABELOS",
+    "constancy": 1.0,
+    "dominant_normalized": "HIDRALISO ALISANTE NATURAL - 1 UNIDADE",
+    "dominant_count": 6,
+    "group_size": 6,
+    "normalized_histogram": [
+      {
+        "normalized": "HIDRALISO ALISANTE NATURAL - 1 UNIDADE",
+        "count": 6
+      }
+    ]
+  },
+  "worst_grouping": {
+    "original": "KIT SHAMPOO CONDICIONADOR AUSSIE BOTOX 3 MINUTE MIRACLE",
+    "constancy": 0.16666666666666666,
+    "dominant_normalized": "AUSSIE KIT SHAMPOO CONDICIONADOR BOTOX 3 MINUTE MIRACLE - 1 UNIDADE",
+    "dominant_count": 1,
+    "group_size": 6,
+    "normalized_histogram": [
+      {
+        "normalized": "AUSSIE KIT SHAMPOO CONDICIONADOR BOTOX 3 MINUTE MIRACLE - 1 UNIDADE",
+        "count": 1
+      },
+      {
+        "normalized": "AUSSIE KIT SHAMPOO CONDICIONADOR BOTOX 3 MINUTE MIRACLE - 3 METROS",
+        "count": 1
+      },
+      {
+        "normalized": "KIT SHAMPOO CONDICIONADOR AUSSIE BOTOX 3 MINUTE MIRACLE - 3 METROS",
+        "count": 1
+      },
+      {
+        "normalized": "KIT SHAMPOO CONDICIONADOR AUSSIE GOTOX 3 MINUTE MIRACLE - 3 METROS",
+        "count": 1
+      },
+      {
+        "normalized": "KIT SHAMPOO CONDICIONADOR AUSSIE MIRACLE BOTOX 3 MINUTE - 3 METROS",
+        "count": 1
+      },
+      {
+        "normalized": "KIT SHAMPOO CONDICIONADOR BOTOX 3 MIRACLE - 3 METROS",
+        "count": 1
+      }
+    ]
+  }
+}

@@ -8,8 +8,9 @@ def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
         entrada = row.get('attacked', row.get('title'))
         saida   = row['normalized']
 
+        # Sem aspas nos exemplos para a LLM não repetir esse padrão na saída
         exemplos.append(
-            f'Entrada: "{entrada}"\nSaída: "{saida}"'
+            f'Entrada: {entrada}\nSaída: {saida}'
         )
 
     return "\n\n".join(exemplos)
@@ -18,7 +19,9 @@ def build_fewshot_examples(df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
 def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAMPLES):
     few_shot_str = build_fewshot_examples(df_few_shot, max_examples)
 
-    itens_str = "\n".join([f'"{item}"' for i, item in enumerate(items_batch)])
+    # Numerando os itens explicitamente para facilitar o parsing
+    itens_str = "\n".join([f'{i+1}. {item}' for i, item in enumerate(items_batch)])
+    n = len(items_batch)
 
     prompt = f"""
         Você é um sistema especializado em normalização de descrições de produtos de notas fiscais brasileiras.
@@ -45,10 +48,12 @@ def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAM
         Exemplos:
         {few_shot_str}
 
-        Itens:
+        Itens para normalizar (total: {n}):
         {itens_str}
 
-        Responda com uma linha por item, na mesma ordem.
-        Sem explicações.
+        INSTRUÇÕES DE RESPOSTA:
+        - Responda EXATAMENTE {n} linhas, uma por item, na mesma ordem
+        - Cada linha deve começar com o número do item seguido de ponto e espaço: "1. ", "2. ", etc.
+        - SEM aspas, SEM explicações, SEM linhas extras
     """
     return prompt

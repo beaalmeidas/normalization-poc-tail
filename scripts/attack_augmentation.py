@@ -126,15 +126,29 @@ def augment(text):
 
 ensure_dir("./data/input")
 
-
 df = pd.read_csv("./data/input/test.csv")
+df_benchmark = df.head(100)
 
 rows = []
 
-for title in df["title"]:
-    variations = augment(title)
+print(f"--- Gerando exatamente 6 variações para cada um dos {len(df_benchmark)} itens")
 
-    for var in variations:
+for title in df_benchmark["title"]:
+    # Usamos um set para garantir que as variações sejam únicas
+    variations = {title} # Começa com o título original
+    
+    # Enquanto não tivermos 6 variações únicas, continuamos tentando "atacar"
+    attempts = 0
+    while len(variations) < 6 and attempts < 50:
+        # Aplica a função augment para gerar novas tentativas
+        new_vars = augment(title)
+        for v in new_vars:
+            if len(variations) < 6:
+                variations.add(v)
+        attempts += 1
+
+    # Adiciona as 6 variações ao dataset final
+    for var in list(variations):
         rows.append({
             "original": title,
             "attacked": var
@@ -143,4 +157,5 @@ for title in df["title"]:
 attack_df = pd.DataFrame(rows)
 attack_df.to_csv("./data/input/attack.csv", index=False)
 
-print("\n--- Dataset com attack augmentation 'attack.csv' gerado\n")
+print(f"\n--- Dataset 'attack.csv' gerado com {len(attack_df)} linhas.")
+print(f"--- Verificação: {len(attack_df)/6} produtos originais processados.")

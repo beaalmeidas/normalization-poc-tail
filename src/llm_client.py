@@ -16,7 +16,9 @@ def call_llm(client, model_id, prompt, max_retries=MAX_RETRIES):
             return response.text.strip()
 
         except Exception as e:
-            wait_time = (2 ** attempt) + random.uniform(0, 1)
+            # Se for erro de lotação (503), esperamos um pouco mais
+            # Aumentamos o multiplicador para dar tempo do servidor respirar
+            wait_time = (5 ** attempt) + random.uniform(0, 5) 
 
             print(f"Erro: {e}")
             print(f"Tentativa {attempt+1}/{max_retries} → aguardando {wait_time:.2f}s\n")
