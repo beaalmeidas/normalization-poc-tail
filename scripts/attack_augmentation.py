@@ -1,161 +1,161 @@
-import pandas as pd
-import random
+"""
+Attack Augmentation via LLM
+Gera variantes adversariais dos títulos originais (Abreviacao, Notacao_Unidades, Erro_Digitacao).
+Adaptado do notebook da equipe para o stack google.genai já usado no projeto.
+"""
+import os
 import re
+import json
+import time
+import logging
+import pandas as pd
+from tqdm import tqdm
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
-from src.utils import ensure_dir
+load_dotenv()
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
 
-# mapa para typos, teclas próximas no teclado
-QWERTY_MAP = {
-    "A": ["S", "Q", "Z"],
-    "B": ["V", "G", "H", "N"],
-    "C": ["X", "D", "F", "V"],
-    "D": ["S", "E", "F", "C", "X"],
-    "E": ["W", "R", "S", "D"],
-    "F": ["D", "R", "G", "V", "C"],
-    "G": ["F", "T", "H", "B", "V"],
-    "H": ["G", "Y", "J", "N", "B"],
-    "I": ["U", "O", "K", "J"],
-    "J": ["H", "U", "K", "M", "N"],
-    "K": ["J", "I", "L", "M"],
-    "L": ["K", "O", "P"],
-    "M": ["N", "J", "K"],
-    "N": ["B", "H", "J", "M"],
-    "O": ["I", "P", "L", "K"],
-    "P": ["O", "L"],
-    "Q": ["W", "A"],
-    "R": ["E", "T", "F", "D"],
-    "S": ["A", "W", "D", "Z", "X"],
-    "T": ["R", "Y", "G", "F"],
-    "U": ["Y", "I", "H", "J"],
-    "V": ["C", "F", "G", "B"],
-    "W": ["Q", "E", "S"],
-    "X": ["Z", "S", "D", "C"],
-    "Y": ["T", "U", "H"],
-    "Z": ["A", "S", "X"]
+# ── Configuração ───────────────────────────────────────────────
+INPUT_PATH   = "data/input/test.csv"
+INPUT_COLUMN = "title"
+ATTACK_PATH  = "data/input/attack.csv"
+
+RANDOM_SEED  = 42
+BATCH_SIZE   = 5
+API_KEY      = os.getenv("API_KEY")
+ATTACK_MODEL = os.getenv("ATTACK_MODEL_ID", "gemini-2.5-flash-preview-05-20")
+
+ATTACK_PROMPT = """
+Você é um gerador de variantes adversariais de títulos de produtos de e-commerce brasileiro.
+
+TAREFA
+Para cada título recebido (identificado por idx), gere 6 (SEIS) variantes adversariais, distribuídas em 3 estratégias diferentes.
+Retorne SOMENTE um array JSON. Sem texto extra, sem markdown.
+
+O formato OBRIGATÓRIO do JSON para CADA objeto no array deve ser:
+{
+  "idx": int,
+  "attacks": [
+    {"tipo": "Abreviacao", "texto": "var1"},
+    {"tipo": "Abreviacao", "texto": "var2"},
+    {"tipo": "Notacao_Unidades", "texto": "var3"},
+    {"tipo": "Notacao_Unidades", "texto": "var4"},
+    {"tipo": "Erro_Digitacao", "texto": "var5"},
+    {"tipo": "Erro_Digitacao", "texto": "var6"}
+  ]
 }
 
-
-def keyboard_typos(text, p=0.1):
-    result = []
-
-    # percorrendo cada caractere de cada item do dataset
-    for char in text:
-        upper = char.upper()
-
-        # typo ocorre no caractere atual se o número sorteado
-            # for menor que p = 10% de chance de typo
-        if upper in QWERTY_MAP and random.random() < p:
-            # escolhe uma tecla adjacente aleatória
-            replacement = random.choice(QWERTY_MAP[upper])
-
-            # if char.islower():
-            #     replacement = replacement.lower()
-
-            result.append(replacement)
-        else:
-            result.append(char)
-
-    return "".join(result)
+ESTRATÉGIAS OBRIGATÓRIAS (Faça exatamente 2 variantes diferentes para cada tipo):
+  1. "Abreviacao": Abreviar palavras longas (ex: "Liquidificador" → "Liq.")
+  2. "Notacao_Unidades": Notação alternativa de unidades (ex: "500ml" → "0,5L", "12kg" → "12 kilos")
+  3. "Erro_Digitacao": Erro de digitação / Trocar caracteres adjacentes (ex: "Samsung" → "Samsugn")
+"""
 
 
-def random_separators(text):
-    return (
-        text
-        .replace("-", " ")
-        .replace("/", " ")
-        .replace("  ", " ")
-    )
+def attack_batch_llm(
+    titles: list[str],
+    client: genai.Client,
+    start_idx: int = 0,
+) -> list[dict]:
+    lines = [f'[{start_idx + i}] "{t}"' for i, t in enumerate(titles)]
+    user_prompt = "\n".join(lines)
+
+    try:
+        response = client.models.generate_content(
+            model=ATTACK_MODEL,
+            contents=user_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=ATTACK_PROMPT,
+                temperature=0.7,
+                max_output_tokens=2048,
+                response_mime_type="application/json",
+            ),
+        )
+        raw_text = response.text.strip()
+        if raw_text.startswith("```"):
+            raw_text = re.sub(r"^```(?:json)?", "", raw_text).rstrip("`").strip()
+        parsed = json.loads(raw_text)
+        if isinstance(parsed, dict):
+            parsed = [parsed]
+        return parsed
+
+    except json.JSONDecodeError:
+        matches = re.findall(r"\{[^{}]+\}", raw_text, re.DOTALL)
+        results = []
+        for m in matches:
+            try:
+                results.append(json.loads(m))
+            except json.JSONDecodeError:
+                continue
+        return results or [{"idx": start_idx + i, "attacked": t} for i, t in enumerate(titles)]
+
+    except Exception as e:
+        logger.error("Erro attack LLM: %s", e)
+        return [{"idx": start_idx + i, "attacked": t} for i, t in enumerate(titles)]
 
 
-def random_case(text):
-    options = [
-        text.lower(),
-        text.upper(),
-        text.capitalize()
-    ]
-    return random.choice(options)
+def run_attack(
+    input_path=INPUT_PATH,
+    input_column=INPUT_COLUMN,
+    attack_path=ATTACK_PATH,
+    n_sample=100,
+):
+    client = genai.Client(api_key=API_KEY)
+
+    df = pd.read_csv(input_path)
+    df_sample = df[[input_column]].sample(n=n_sample, random_state=RANDOM_SEED).reset_index(drop=True)
+    print(f"Títulos para processar: {len(df_sample)}")
+
+    titles_orig = df_sample[input_column].tolist()
+    n_attack = len(titles_orig)
+    registros_ataque = []
+
+    for batch_start in tqdm(range(0, n_attack, BATCH_SIZE), desc="Attack", unit="batch"):
+        batch_end = min(batch_start + BATCH_SIZE, n_attack)
+        batch = titles_orig[batch_start:batch_end]
+
+        raw_list = attack_batch_llm(batch, client, start_idx=batch_start)
+
+        for local_i in range(batch_end - batch_start):
+            global_i = batch_start + local_i
+
+            matched = next(
+                (r for r in raw_list if isinstance(r, dict) and r.get("idx") == global_i),
+                None,
+            )
+
+            if matched and "attacks" in matched and isinstance(matched["attacks"], list):
+                ataques = matched["attacks"]
+            else:
+                ataques = [{"tipo": "Fallback_Erro_LLM", "texto": titles_orig[global_i]}] * 6
+
+            for ataque in ataques:
+                if isinstance(ataque, dict):
+                    tipo  = ataque.get("tipo", "Desconhecido")
+                    texto = ataque.get("texto", titles_orig[global_i])
+                else:
+                    tipo  = "Desconhecido"
+                    texto = str(ataque)
+
+                registros_ataque.append({
+                    "id": global_i,
+                    "original": titles_orig[global_i],
+                    "tipo_variacao": tipo,
+                    "attacked": texto,
+                })
+
+        time.sleep(2)
+
+    df_attack = pd.DataFrame(registros_ataque)
+    os.makedirs(os.path.dirname(attack_path), exist_ok=True)
+    df_attack.to_csv(attack_path, index=False, encoding="utf-8-sig")
+    print(f"Attack concluído: {len(titles_orig)} títulos → {len(df_attack)} linhas → {attack_path}")
+    return df_attack
 
 
-def drop_words(text, p=0.2):
-    words = text.split()
-    words = [w for w in words if random.random() > p]
-    return " ".join(words)
-
-
-def shuffle_words(text):
-    words = text.split()
-    random.shuffle(words) 
-    return " ".join(words)
-
-
-# evitando que conjuntos semânticos "COM/SEM + substantivo" sejam separados
-    # já que não seria uma alteração realista e atrapalharia o processamento
-COMPOSITION_PATTERN = r"\b(SEM|COM)\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ]+)"
-
-def protect_compositions(text: str):
-    protected = []
-
-    def repl(match):
-        token = f"__COMP_{len(protected)}__"
-        protected.append(match.group(0))
-        return token
-
-    text = re.sub(COMPOSITION_PATTERN, repl, text)
-    return text, protected
-
-
-def restore_compositions(text: str, protected):
-    for i, original in enumerate(protected):
-        text = text.replace(f"__COMP_{i}__", original)
-    return text
-
-
-def augment(text):
-    variations = [
-        text,
-        keyboard_typos(text),
-        random_separators(text),
-        random_case(text),
-        drop_words(text),
-        shuffle_words(text),
-    ]
-
-    return list(set([v for v in variations if v.strip()]))
-
-
-ensure_dir("./data/input")
-
-df = pd.read_csv("./data/input/test.csv")
-df_benchmark = df.head(100)
-
-rows = []
-
-print(f"--- Gerando exatamente 6 variações para cada um dos {len(df_benchmark)} itens")
-
-for title in df_benchmark["title"]:
-    # Usamos um set para garantir que as variações sejam únicas
-    variations = {title} # Começa com o título original
-    
-    # Enquanto não tivermos 6 variações únicas, continuamos tentando "atacar"
-    attempts = 0
-    while len(variations) < 6 and attempts < 50:
-        # Aplica a função augment para gerar novas tentativas
-        new_vars = augment(title)
-        for v in new_vars:
-            if len(variations) < 6:
-                variations.add(v)
-        attempts += 1
-
-    # Adiciona as 6 variações ao dataset final
-    for var in list(variations):
-        rows.append({
-            "original": title,
-            "attacked": var
-        })
-
-attack_df = pd.DataFrame(rows)
-attack_df.to_csv("./data/input/attack.csv", index=False)
-
-print(f"\n--- Dataset 'attack.csv' gerado com {len(attack_df)} linhas.")
-print(f"--- Verificação: {len(attack_df)/6} produtos originais processados.")
+if __name__ == "__main__":
+    run_attack()
