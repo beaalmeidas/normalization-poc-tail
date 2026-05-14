@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 # ── Configuração ───────────────────────────────────────────────
 INPUT_PATH   = "data/input/test.csv"
 INPUT_COLUMN = "title"
-ATTACK_PATH  = "data/input/attack.csv"
+ATTACK_PATH  = "data/input/train_supervised.csv"
 
 RANDOM_SEED  = 42
 BATCH_SIZE   = 5
-API_KEY      = os.getenv("API_KEY")
+API_KEY      = os.getenv("GOOGLE_API_KEY")
 ATTACK_MODEL = os.getenv("ATTACK_MODEL_ID", "gemini-2.5-flash-preview-05-20")
 
 ATTACK_PROMPT = """
@@ -97,13 +97,13 @@ def run_attack(
     input_path=INPUT_PATH,
     input_column=INPUT_COLUMN,
     attack_path=ATTACK_PATH,
-    n_sample=100,
+    n_sample=20,
 ):
     client = genai.Client(api_key=API_KEY)
 
     df = pd.read_csv(input_path)
     df_sample = df[[input_column]].sample(n=n_sample, random_state=RANDOM_SEED).reset_index(drop=True)
-    print(f"Títulos para processar: {len(df_sample)}")
+    print(f"\n--- Títulos para processar: {len(df_sample)}")
 
     titles_orig = df_sample[input_column].tolist()
     n_attack = len(titles_orig)

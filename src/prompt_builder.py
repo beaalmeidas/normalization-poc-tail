@@ -61,15 +61,15 @@ def build_fewshot_prompt(items_batch, df_few_shot, max_examples=MAX_FEWSHOT_EXAM
         - NÃO pule linhas
     """
 
-    # salvando o prompt construído
-    output_dir = "data/output"
-    os.makedirs(output_dir, exist_ok=True)
+    # # salvando o prompt construído
+    # output_dir = "data/output"
+    # os.makedirs(output_dir, exist_ok=True)
 
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_path = os.path.join(output_dir, f"prompt_{timestamp}.txt")
+    # timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    # file_path = os.path.join(output_dir, f"prompt_{timestamp}.txt")
 
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(f"TOTAL_ITENS: {len(items_batch)}\n\n")
-        f.write(prompt)
+    # with open(file_path, "w", encoding="utf-8") as f:
+    #     f.write(f"TOTAL_ITENS: {len(items_batch)}\n\n")
+    #     f.write(prompt)
 
     return prompt

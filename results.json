@@ -1,0 +1,60 @@
+{
+  "metrics": {
+    "mean_constancy": 0.5869747899159664,
+    "min_constancy": 0.14285714285714285,
+    "max_constancy": 1.0,
+    "num_originals": 85,
+    "total_rows": 451,
+    "weighted_constancy": 0.5787139689578714
+  },
+  "best_grouping": {
+    "original": "AMLA EM PO SELANTE MILENAR INDIANO PRODUTOS CABELO OFERTA",
+    "constancy": 1.0,
+    "dominant_normalized": "AMLA EM PO SELANTE MILENAR IND PROD CABELO OFRT - 1 UNIDADE",
+    "dominant_count": 1,
+    "group_size": 1,
+    "normalized_histogram": [
+      {
+        "normalized": "AMLA EM PO SELANTE MILENAR IND PROD CABELO OFRT - 1 UNIDADE",
+        "count": 1
+      }
+    ]
+  },
+  "worst_grouping": {
+    "original": "KIT INVIGO NUTRI ENRICH SHAMPOO CONDICIONADOR WELLA",
+    "constancy": 0.14285714285714285,
+    "dominant_normalized": "KIT INVIGO NUTRI ENRICH 2 UN SHAMPOO CONDICIONADOR WELLA - 1 UNIDADE",
+    "dominant_count": 1,
+    "group_size": 7,
+    "normalized_histogram": [
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH 2 UN SHAMPOO CONDICIONADOR WELLA - 1 UNIDADE",
+        "count": 1
+      },
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH SHAMP. CONDICIONADOR WELLA - 1 UNIDADE",
+        "count": 1
+      },
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH SHAMPOO CONDICIONADOR WELLA - 1 UNIDADE",
+        "count": 1
+      },
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH SHAMPOO CONDICIONADOR WELLA - 2 UNIDADES, 2 UNIDADES",
+        "count": 1
+      },
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH SHAMPOO CONDICIONADOR WLELA - 1 UNIDADE",
+        "count": 1
+      },
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH SHAMPOO CONDIICIONADOR WELLA - 1 UNIDADE",
+        "count": 1
+      },
+      {
+        "normalized": "KIT INVIGO NUTRI ENRICH SHAMPOO E CONDICIONADOR WELLA DUO - 1 UNIDADE",
+        "count": 1
+      }
+    ]
+  }
+}

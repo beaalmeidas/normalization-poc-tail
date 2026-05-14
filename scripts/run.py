@@ -16,7 +16,7 @@ client = genai.Client(api_key=API_KEY)
 
 
 df = pd.read_csv("data/input/attack.csv")
-df = df.sample(10, random_state=42)
+#df = df.sample(10, random_state=42)
 
 df_few_shot = pd.read_csv("data/input/train_supervised.csv")
 
