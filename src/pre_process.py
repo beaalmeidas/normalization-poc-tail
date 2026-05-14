@@ -25,13 +25,43 @@ def extract_measurement_and_packaging(text: str):
     }
 
 
+# realiza conversões entre unidades em casos de produtos iguais
+    # com unidades diferentes
+def convert_to_base_unit(valor: float, unidade: str):
+    unidade = unidade.upper()
+
+    conversion_map = {
+        "L": ("ML", 1000),
+        "LT": ("ML", 1000),
+        "LTS": ("ML", 1000),
+        "ML": ("ML", 1),
+
+        "KG": ("G", 1000),
+        "QUILO": ("G", 1000),
+        "KILO": ("G", 1000),
+        "G": ("G", 1),
+        "GR": ("G", 1),
+    }
+
+    if unidade in conversion_map:
+        base_unit, factor = conversion_map[unidade]
+        return valor * factor, base_unit
+
+    return valor, unidade
+
+
 # define quantidades e embalagem em pares número-unidade
 def parse_measurements_and_packaging(medidas: dict):
     result = []
 
     if medidas["peso_volume"]:
         valor, unidade = medidas["peso_volume"]
-        result.append((float(valor), unidade))
+        valor = float(valor.replace(",", "."))
+
+        valor_convertido, unidade_convertida = convert_to_base_unit(valor, unidade)
+        valor_convertido = round(valor_convertido, 2)
+
+        result.append((valor_convertido, unidade_convertida))
 
     if medidas["tipo_embalagem"]:
         tipo, qtd = medidas["tipo_embalagem"]
@@ -43,7 +73,16 @@ def parse_measurements_and_packaging(medidas: dict):
 
     if medidas["multipack"]:
         qtd_pack, valor, unidade = medidas["multipack"]
-        result.append((int(qtd_pack), "UN"))
+
+        valor = float(valor.replace(",", "."))
+        qtd_pack = int(qtd_pack)
+
+        valor_convertido, unidade_convertida = convert_to_base_unit(valor, unidade)
+
+        total = qtd_pack * valor_convertido
+        total = round(total, 2)
+
+        result.append((total, unidade_convertida))
 
     return result if result else [(1, "UN")]
 
